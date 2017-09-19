@@ -64,22 +64,19 @@ def _get_paths_array(path_to_subjects, extension):
 
 
 def _to_array(path_to_image):
-    """ Transforms a path to an image file into an ndarray of dimensions (1,total_size_of_image)
-    holding the value for each element of the image (e.g each pixel if it an 8 bits per pixel image).
+    """ Transforms a path to an image file into an ndarray with the image's shape.
 
     Args:
         path_to_image (str): Path to the image to be transformed.
     Returns:
         ndarray: The result array of applying the transformation.
     """
-    image = im.imread(path_to_image) / 255.0  # Read image
-    image.resize([1, image.size])  # Resize Image
-    return image
+    return im.imread(path_to_image) / 255.0  # Read image
 
 
 def _validate(all_subjects_dict):
     """ Validates the given all_subjects list, which must hold a list of images represented by numpy's ndarray.
-    All lists of images, and all images, must be the same size.
+    All lists of images must be of the same size, and all images of the same shape.
     Args:
         all_subjects_dict (dict): A dictionary holding each subject's list of images.
 
@@ -114,9 +111,9 @@ def _validate(all_subjects_dict):
         # TODO: define custom exception?
         raise ValueError("There is one or more elements that is not an ndarray (representation of image)")
 
-    # Check each image has the same size
-    total_size_of_images = all_subjects[0][0].size
+    # Check each image has the same shape
+    image_shape = all_subjects[0][0].shape
     if filter(lambda subject_images:
-              filter(lambda image_array: image_array.size != total_size_of_images, subject_images), all_subjects):
+              filter(lambda image_array: image_array.shape != image_shape, subject_images), all_subjects):
         # TODO: define custom exception?
-        raise ValueError("Mismatch between sizes of images")
+        raise ValueError("Mismatch between image shapes")
